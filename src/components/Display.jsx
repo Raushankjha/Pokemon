@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Display() {
     const pokemons = [
@@ -148,12 +148,45 @@ function Display() {
         },
     ];
     const [pokemon, setPokemon] = useState(pokemons)
+    const [pagenumber, setPagenumber] = useState(1)
+    const perpagePokemon = 1;
+    const [selectPokemon , setSelectpokemon] = useState("")
+
+    useEffect(()=>{
+        let startIndex = (pagenumber - 1) * perpagePokemon;
+        let endIndex = startIndex + perpagePokemon;
+        let navigatePokemon = [...pokemons].slice(startIndex,endIndex);
+        setPokemon(navigatePokemon);
+        setSelectpokemon(navigatePokemon[0] ?.name || "" )
+
+    },[pagenumber])
+
     function handleChange(e) {
         const changeValue = e.target.value
-        const filterData = pokemons.filter((ele) => {
+        const filterData = [...pokemons].filter((ele) => {
             return ele.name === changeValue;
         })
         setPokemon(filterData)
+    }
+
+
+    function handleNext(){
+        let totalPage= pokemons.length / perpagePokemon;
+        if(pagenumber === totalPage){
+            setPagenumber(pagenumber);
+        }
+        else{
+            setPagenumber((curr)=> curr + 1)
+        }
+    }
+
+    function handlePrev(){
+        if(pagenumber === 1){
+            setPagenumber(1)
+        }
+        else{
+            setPagenumber((curr)=> curr - 1)
+        }
     }
 
     return (
@@ -161,8 +194,9 @@ function Display() {
             <div style={{ width: "100%", height: "auto", boxSizing: "border-box" }}>
                 <div style={{ width: "400px", height: "500px", alignItems: "center", margin: "100px auto " }}>
                     <div>
-                        <select onChange={handleChange} style={{ marginLeft: "150px", padding: "10px" }}>
-                            <option>No one</option>
+                        <select onChange={handleChange} value={selectPokemon} style={{ marginLeft: "150px", padding: "10px" }}>
+                            <option value="">pokemon</option>
+                            
                             {
                                 pokemons.map((ele) => {
                                     return <option>{ele.name}</option>
@@ -183,8 +217,8 @@ function Display() {
                             }
                         </div>
                         <div style={{display:"flex",justifyContent:"space-between", alignItems:"center"}}>
-                            <button style={{ padding: "10px", border: "5px", background: "black", color: "white" }}>Previous</button>
-                            <button style={{ padding: "10px", border: "5px", background: "black", color: "white" }}>Next</button>
+                            <button style={{ padding: "10px", border: "5px", background: "black", color: "white" }} onClick={handlePrev}>Previous</button>
+                            <button style={{ padding: "10px", border: "5px", background: "black", color: "white" }} onClick={handleNext}>Next</button>
 
                         </div>
 
